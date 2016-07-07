@@ -446,12 +446,7 @@ trait EventStoreProtoFormats extends DefaultProtoFormats with DefaultFormats {
   }
 
   private def expectedVersion(x: ExpectedVersion): Int = {
-    import ExpectedVersion._
-    x match {
-      case NoStream => -1
-      case Any      => -2
-      case Exact(v) => v
-    }
+    x.asInt()
   }
 
   trait Converter[A, B] {

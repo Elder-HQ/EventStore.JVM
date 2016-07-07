@@ -1,6 +1,8 @@
 package eventstore
 
-sealed trait ExpectedVersion
+sealed trait ExpectedVersion {
+  def asInt(): Int
+}
 
 object ExpectedVersion {
   val First: Exact = Exact(0)
@@ -14,6 +16,8 @@ object ExpectedVersion {
   //The stream being written to should not yet exist. If it does exist treat that as a concurrency problem.
   case object NoStream extends ExpectedVersion {
     override def toString = "Expected.NoStream"
+
+    override def asInt(): Int = -1
   }
 
   sealed trait Existing extends ExpectedVersion
@@ -21,6 +25,7 @@ object ExpectedVersion {
   // This write should not conflict with anything and should always succeed.
   case object Any extends Existing {
     override def toString = "Expected.AnyVersion"
+    override def asInt(): Int = -2
   }
 
   // States that the last event written to the stream should have a sequence number matching your expected value.
@@ -28,6 +33,7 @@ object ExpectedVersion {
     require(value >= 0, s"expected version must be >= 0, but is $value")
 
     override def toString = s"Expected.Version($value)"
+    override def asInt(): Int = value
   }
 
   object Exact {
